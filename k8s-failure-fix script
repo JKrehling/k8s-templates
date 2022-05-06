@@ -1,0 +1,32 @@
+#k8s node fixer thing
+
+vi /etc/containerd/config.toml
+disabled_plugins = ["io.containerd.grpc.v1.cri"]
+#disabled_plugins = []
+
+systemctl stop kubelet
+systemctl stop containerd
+pkill -f containerd
+systemctl reset-failed
+systemctl start containerd
+
+
+ctr -n k8s.io c ls -q
+ctr -n k8s.io c rm $(ctr -n k8s.io c ls -q)
+
+systemctl disable kubelet
+systemctl disable containerd 
+shutdown -r now 
+rm -rf /var/lib/kubelet/pods/*
+
+ 
+
+vi /etc/containerd/config.toml
+#disabled_plugins = ["io.containerd.grpc.v1.cri"]
+disabled_plugins = []
+
+systemctl stop containerd
+systemctl start containerd
+systemctl enable kubelet
+systemctl enable containerd
+systemctl start kubelet
